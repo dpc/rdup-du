@@ -2,7 +2,7 @@ extern crate getopts;
 extern crate collections;
 
 use collections::treemap::TreeSet;
-use getopts::{optopt,optflag,getopts,OptGroup};
+use getopts::{optflag,getopts,OptGroup};
 use std::cmp::{Ordering,Less,Equal,Greater};
 use std::io;
 use std::io::fs;
@@ -53,7 +53,7 @@ fn is_link(p : &Path) -> bool {
 	}
 }
 
-fn format_size(size : u64) -> ~str {
+fn bytes_to_humanreadable(size : u64) -> ~str {
 	let postfixes = ["B", "K", "M", "G", "T"];
 
 	for (i, postfix) in postfixes.iter().enumerate() {
@@ -63,7 +63,11 @@ fn format_size(size : u64) -> ~str {
 	}
 
 	let i = postfixes.len() - 1;
-	format!("{:>6}{}", size / pow(1024u64, i), postfixes[i])
+	format!("{}{}", size / pow(1024u64, i), postfixes[i])
+}
+
+fn bytes_to_str(size : u64) -> ~str {
+	format!("{:>12}", size)
 }
 
 fn visit_dirs(dir: &Path, cb: |&Path|, err: |&Path, IoError|) {
@@ -101,7 +105,7 @@ fn print_error_path(p : &Path, e : IoError) {
 	(writeln!(&mut stderr(), "{}: {}", p.display(), e)).unwrap();
 }
 
-fn visit_dirs_summary(dir: &Path) {
+fn visit_dirs_summary(dir: &Path, size_f : |u64| -> ~str) {
 	let mut entries = TreeSet::<SizeSortedFile>::new();
 
 	match fs::readdir(dir) {
@@ -143,17 +147,17 @@ fn visit_dirs_summary(dir: &Path) {
 
 	let mut total_size = 0;
 	for entry in entries.iter() {
-		println!("{} {}", format_size(entry.size), entry.entry.display());
+		println!("{:>7} {}", size_f(entry.size), entry.entry.display());
 		total_size = total_size + entry.size;
 	}
 
 	println!("");
-	println!("{} total", format_size(total_size));
+	println!("{:>7} total", size_f(total_size));
 }
 
 fn print_usage(program: &str, _opts: &[OptGroup]) {
 	println!("Usage: {} [options]", program);
-	println!("-b\tPrint size in bytes");
+	println!("-b --bytes\tPrint size in bytes");
 	println!("-h --help\tUsage");
 }
 
@@ -162,7 +166,7 @@ fn main() {
 	let program = args[0].clone();
 
 	let opts = [
-		optopt("b", "", "print size in bytes", "NAME"),
+		optflag("b", "bytes", "print size in bytes"),
 		optflag("h", "help", "print this help menu")
 			];
 
@@ -174,14 +178,17 @@ fn main() {
 		print_usage(program, opts);
 		return;
 	}
-	if matches.opt_present("b") {
-		fail!("not implemented");
-	}
 	let dir = if !matches.free.is_empty() {
 		(*matches.free.get(0)).clone()
 	} else {
 		~"."
 	};
 
-	visit_dirs_summary(&std::path::Path::new(dir));
+	let d = &std::path::Path::new(dir);
+
+	if matches.opt_present("b") {
+		visit_dirs_summary(d, bytes_to_str);
+	} else {
+		visit_dirs_summary(d, bytes_to_humanreadable);
+	}
 }
