@@ -114,28 +114,22 @@ fn visit_dirs_summary(dir: &Path, size_f : |u64| -> ~str) {
 				let size = if !is_link(entry) && entry.is_dir() {
 					let mut size = 0;
 					visit_dirs(entry, |p| if p.is_file() {
-						match lstat(p) {
-							Ok(lstat) => {
-								size = size + lstat.size;
-							},
-							Err(err) => {
-								print_error_path(entry, err);
-							}
-						}
+
+						lstat(p)
+							.map(|l| size = size + l.size)
+							.unwrap_or_handle(
+								|e| {print_error_path(p, e)}
+								)
 					},
 					print_error_path
 					);
 					size
 				} else {
-					match lstat(entry) {
-							Ok(lstat) => {
-								lstat.size
-							},
-							Err(err) => {
-								print_error_path(entry, err);
-								0
-							}
-						}
+					lstat(entry)
+						.map(|l| l.size)
+						.unwrap_or_handle(
+							|e| {print_error_path(entry, e); 0}
+							)
 				};
 				entries.insert(SizeSortedFile{entry: entry.clone(), size: size});
 			}
