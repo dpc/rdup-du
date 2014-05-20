@@ -2,7 +2,7 @@ extern crate getopts;
 extern crate collections;
 
 use collections::treemap::TreeSet;
-use getopts::{optflag,getopts,OptGroup};
+use getopts::{optflag,getopts};
 use std::cmp::{Ordering,Less,Equal,Greater};
 use std::io;
 use std::io::fs;
@@ -117,7 +117,7 @@ fn visit_dirs_summary(dir: &Path, size_f : |u64| -> ~str) {
 
 						lstat(p)
 							.map(|l| size = size + l.size)
-							.unwrap_or_handle(
+							.unwrap_or_else(
 								|e| {print_error_path(p, e)}
 								)
 					},
@@ -127,7 +127,7 @@ fn visit_dirs_summary(dir: &Path, size_f : |u64| -> ~str) {
 				} else {
 					lstat(entry)
 						.map(|l| l.size)
-						.unwrap_or_handle(
+						.unwrap_or_else(
 							|e| {print_error_path(entry, e); 0}
 							)
 				};
@@ -149,15 +149,18 @@ fn visit_dirs_summary(dir: &Path, size_f : |u64| -> ~str) {
 	println!("{:>7} total", size_f(total_size));
 }
 
-fn print_usage(program: &str, _opts: &[OptGroup]) {
+fn print_usage(program: &StrBuf) {
 	println!("Usage: {} [options]", program);
 	println!("-b --bytes\tPrint size in bytes");
 	println!("-h --help\tUsage");
 }
 
 fn main() {
-	let args = os::args();
-	let program = args[0].clone();
+	let args: Vec<StrBuf> = os::args().iter()
+		.map(|x| x.to_strbuf())
+		.collect();
+
+	let program = args.get(0).clone();
 
 	let opts = [
 		optflag("b", "bytes", "print size in bytes"),
@@ -169,13 +172,13 @@ fn main() {
 		Err(f) => { fail!(f.to_err_msg()) }
 	};
 	if matches.opt_present("h") {
-		print_usage(program, opts);
+		print_usage(&program);
 		return;
 	}
 	let dir = if !matches.free.is_empty() {
 		(*matches.free.get(0)).clone()
 	} else {
-		~"."
+		".".to_strbuf()
 	};
 
 	let d = &std::path::Path::new(dir);
