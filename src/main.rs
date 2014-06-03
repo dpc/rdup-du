@@ -3,7 +3,7 @@ extern crate collections;
 
 use collections::treemap::TreeSet;
 use getopts::{optflag,getopts};
-use std::cmp::{Ordering,Less,Equal,Greater};
+use std::cmp::{Ord,Eq,PartialEq,PartialOrd,Ordering,Less,Equal,Greater};
 use std::io;
 use std::io::fs;
 use std::io::fs::lstat;
@@ -19,7 +19,7 @@ struct SizeSortedFile {
 	size : u64,
 }
 
-impl TotalOrd for SizeSortedFile {
+impl Ord for SizeSortedFile {
 	fn cmp(&self, other: &SizeSortedFile) -> Ordering {
 		if self.size < other.size {
 			Less
@@ -31,19 +31,20 @@ impl TotalOrd for SizeSortedFile {
 	}
 }
 
-impl Ord for SizeSortedFile {
+
+impl PartialOrd for SizeSortedFile {
 	fn lt(&self, other: &SizeSortedFile) -> bool {
 		self.size < other.size
 	}
 }
 
-impl TotalEq for SizeSortedFile {
-}
-
-impl Eq for SizeSortedFile {
+impl PartialEq for SizeSortedFile {
 	fn eq(&self, other: &SizeSortedFile) -> bool {
 		self.size == other.size
 	}
+}
+
+impl Eq for SizeSortedFile {
 }
 
 fn is_link(p : &Path) -> bool {
@@ -53,7 +54,7 @@ fn is_link(p : &Path) -> bool {
 	}
 }
 
-fn bytes_to_humanreadable(size : u64) -> ~str {
+fn bytes_to_humanreadable(size : u64) -> String {
 	let postfixes = ["B", "K", "M", "G", "T"];
 
 	for (i, postfix) in postfixes.iter().enumerate() {
@@ -66,7 +67,7 @@ fn bytes_to_humanreadable(size : u64) -> ~str {
 	format!("{}{}", size / pow(1024u64, i), postfixes[i])
 }
 
-fn bytes_to_str(size : u64) -> ~str {
+fn bytes_to_str(size : u64) -> String {
 	format!("{:>12}", size)
 }
 
@@ -100,12 +101,11 @@ fn visit_dirs(dir: &Path, cb: |&Path|, err: |&Path, IoError|) {
 	}
 }
 
-
 fn print_error_path(p : &Path, e : IoError) {
 	(writeln!(&mut stderr(), "{}: {}", p.display(), e)).unwrap();
 }
 
-fn visit_dirs_summary(dir: &Path, size_f : |u64| -> ~str) {
+fn visit_dirs_summary(dir: &Path, size_f : |u64| -> String) {
 	let mut entries = TreeSet::<SizeSortedFile>::new();
 
 	match fs::readdir(dir) {
@@ -149,16 +149,14 @@ fn visit_dirs_summary(dir: &Path, size_f : |u64| -> ~str) {
 	println!("{:>7} total", size_f(total_size));
 }
 
-fn print_usage(program: &StrBuf) {
+fn print_usage(program: &str) {
 	println!("Usage: {} [options]", program);
 	println!("-b --bytes\tPrint size in bytes");
 	println!("-h --help\tUsage");
 }
 
 fn main() {
-	let args: Vec<StrBuf> = os::args().iter()
-		.map(|x| x.to_strbuf())
-		.collect();
+	let args: Vec<String> = os::args();
 
 	let program = args.get(0).clone();
 
@@ -172,13 +170,13 @@ fn main() {
 		Err(f) => { fail!(f.to_err_msg()) }
 	};
 	if matches.opt_present("h") {
-		print_usage(&program);
+		print_usage(program.as_slice());
 		return;
 	}
 	let dir = if !matches.free.is_empty() {
 		(*matches.free.get(0)).clone()
 	} else {
-		".".to_strbuf()
+		".".to_string()
 	};
 
 	let d = &std::path::Path::new(dir);
