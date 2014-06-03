@@ -58,8 +58,8 @@ fn bytes_to_humanreadable(size : u64) -> String {
 	let postfixes = ["B", "K", "M", "G", "T"];
 
 	for (i, postfix) in postfixes.iter().enumerate() {
-		if size < pow(1024u64, i+1) {
-			return format!("{:>7}{}", size / pow(1024u64, i), postfix)
+		if size < pow(1000u64, i+1) {
+			return format!("{:>7}{}", size / pow(1000u64, i), postfix)
 		}
 	}
 
