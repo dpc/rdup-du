@@ -24,7 +24,7 @@ clean:
 
 $(OUT)/$(PROJECT): $(SRC)/*.rs
 	mkdir -p $(OUT)
-	rustc $(RCFLAGS) --out-dir=$(OUT) -o $(OUT)/$(PROJECT)  src/main.rs
+	rustc $(RCFLAGS) -o $(OUT)/$(PROJECT)  src/main.rs
 
 run: $(OUT)/$(PROJECT)
 	LOG=$(LOG_LEVEL) $(OUT)/$(PROJECT)
