@@ -33,8 +33,14 @@ impl Ord for SizeSortedFile {
 
 
 impl PartialOrd for SizeSortedFile {
-	fn lt(&self, other: &SizeSortedFile) -> bool {
-		self.size < other.size
+	fn partial_cmp(&self, other: &SizeSortedFile) -> Option<Ordering> {
+		if self.size < other.size {
+			Some(Less)
+		} else if self.size > other.size {
+			Some(Greater)
+		} else {
+			Some(Equal)
+		}
 	}
 }
 
