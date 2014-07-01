@@ -1,0 +1,9 @@
+[package]
+
+name = "rdu"
+version = "0.0.1"
+authors = [ "dpc@ucore.info" ]
+
+[[bin]]
+name = "rdu"
+path = "src/main.rs"
