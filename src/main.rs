@@ -53,11 +53,11 @@ impl PartialEq for SizeSortedFile {
 impl Eq for SizeSortedFile {
 }
 
-fn is_link(p : &Path) -> bool {
-	match lstat(p).unwrap().kind {
+fn is_link(p : &Path) -> Result<bool,IoError> {
+	lstat(p).map(|e| match e.kind {
 		TypeSymlink => true,
 		_ => false,
-	}
+	})
 }
 
 fn bytes_to_humanreadable(size : u64) -> String {
@@ -91,7 +91,9 @@ fn visit_dirs(dir: &Path, cb: |&Path|, err: |&Path, IoError|) {
 		match contents {
 			Ok(contents) => {
 				for entry in contents.iter() {
-					if !is_link(entry) && entry.is_dir() {
+					if !is_link(entry).unwrap_or_else(
+						|e| {print_error_path(entry, e); false}
+						) && entry.is_dir() {
 						visit_dirs(entry, |p| cb(p), |p, e| err(p, e));
 					} else {
 						cb(entry);
@@ -117,7 +119,9 @@ fn visit_dirs_summary(dir: &Path, size_f : |u64| -> String) {
 	match fs::readdir(dir) {
 		Ok(dir) => {
 			for entry in dir.iter() {
-				let size = if !is_link(entry) && entry.is_dir() {
+				let size = if !is_link(entry).unwrap_or_else(
+						|e| {print_error_path(entry, e); true}
+						) && entry.is_dir() {
 					let mut size = 0;
 					visit_dirs(entry, |p| if p.is_file() {
 
