@@ -1,5 +1,7 @@
 # RDUP Disk Usage
 
+[![Build Status](https://travis-ci.org/dpc/rdu.svg?branch=master)](https://travis-ci.org/dpc/rdu)
+
 ## Introduction
 
 `rdu` is a simple tools that will estimate the disk usage of files that will be backed up by [rdup backup utility][1]
