@@ -168,7 +168,7 @@ fn print_usage(program: &str) {
 fn main() {
 	let args: Vec<String> = os::args();
 
-	let program = args.get(0).clone();
+	let program = args[0].clone();
 
 	let opts = [
 		optflag("b", "bytes", "print size in bytes"),
@@ -184,7 +184,7 @@ fn main() {
 		return;
 	}
 	let dir = if !matches.free.is_empty() {
-		(*matches.free.get(0)).clone()
+		matches.free[0].clone()
 	} else {
 		".".to_string()
 	};
