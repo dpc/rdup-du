@@ -13,6 +13,7 @@ use std::io::TypeSymlink;
 use std::num::pow;
 use std::os;
 use std::path::Path;
+use std::io::fs::PathExtensions;
 
 struct SizeSortedFile {
 	entry : Path,
@@ -210,6 +211,7 @@ struct CmdConfig {
 	bytes : bool
 }
 
+#[allow(dead_code)]
 fn main() {
 	let args: Vec<String> = os::args();
 
