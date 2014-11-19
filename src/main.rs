@@ -1,7 +1,7 @@
 extern crate getopts;
 extern crate collections;
 
-use collections::treemap::TreeSet;
+use collections::TreeSet;
 use getopts::{optflag,getopts};
 use std::cmp::{Ord,Eq,PartialEq,PartialOrd,Ordering,Less,Equal,Greater};
 use std::io;
@@ -10,7 +10,6 @@ use std::io::fs::lstat;
 use std::io::IoError;
 use std::io::stdio::stderr;
 use std::io::TypeSymlink;
-use std::num::pow;
 use std::os;
 use std::path::Path;
 use std::io::fs::PathExtensions;
@@ -90,14 +89,17 @@ fn should_visit(p : &Path, fs : Option<u64>) -> bool {
 fn bytes_to_humanreadable(size : u64) -> String {
 	let postfixes = ["B", "K", "M", "G", "T"];
 
-	for (i, postfix) in postfixes.iter().enumerate() {
-		if size < pow(1000u64, i+1) {
-			return format!("{:>7}{}", size / pow(1000u64, i), postfix)
+	let mut size = size;
+	for postfix in postfixes.iter() {
+		if size < 1000u64 {
+			return format!("{:>7}{}", size , postfix)
 		}
+
+		size /= 1000u64 ;
 	}
 
 	let i = postfixes.len() - 1;
-	format!("{}{}", size / pow(1024u64, i), postfixes[i])
+	format!("{}{}", size , postfixes[i])
 }
 
 fn bytes_to_string(size : u64) -> String {
@@ -223,7 +225,7 @@ fn main() {
 		optflag("x", "localfs", "stay on local filesystem"),
 			];
 
-	let matches = match getopts(args.tail(), opts) {
+	let matches = match getopts(args.tail(), opts.as_slice()) {
 		Ok(m) => { m }
 		Err(f) => { panic!(f.to_string()) }
 	};
