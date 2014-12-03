@@ -4,3 +4,7 @@ before_script:
   - cargo -V
 script:
   - make
+notifications:
+    email:
+      on_success: change
+      on_failure: change
