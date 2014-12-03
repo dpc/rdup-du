@@ -9,7 +9,7 @@ use std::io::fs;
 use std::io::fs::lstat;
 use std::io::IoError;
 use std::io::stdio::stderr;
-use std::io::TypeSymlink;
+use std::io::FileType::Symlink;
 use std::os;
 use std::path::Path;
 use std::io::fs::PathExtensions;
@@ -55,7 +55,7 @@ impl Eq for SizeSortedFile {
 
 fn is_link(p : &Path) -> Result<bool,IoError> {
 	lstat(p).map(|e| match e.kind {
-		TypeSymlink => true,
+		Symlink => true,
 		_ => false,
 	})
 }
