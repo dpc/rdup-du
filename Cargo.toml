@@ -7,6 +7,3 @@ authors = [ "dpc@ucore.info" ]
 [[bin]]
 name = "rdu"
 path = "src/main.rs"
-
-[dependencies.hyper]
-git = "https://github.com/hyperium/hyper.git"
