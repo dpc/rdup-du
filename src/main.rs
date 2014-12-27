@@ -1,9 +1,10 @@
 extern crate getopts;
-extern crate collections;
+extern crate collect;
 
-use collections::TreeSet;
+use collect::TreeSet;
 use getopts::{optflag,getopts};
-use std::cmp::{Ord,Eq,PartialEq,PartialOrd,Ordering,Less,Equal,Greater};
+use std::cmp::{Ord,Eq,PartialEq,PartialOrd,Ordering};
+use std::cmp::Ordering::{Less,Equal,Greater};
 use std::io;
 use std::io::fs;
 use std::io::fs::lstat;
@@ -143,10 +144,10 @@ fn print_error_path(p : &Path, e : IoError) {
 fn visit_dirs_summary(dir: &Path, config : &CmdConfig) {
 	let mut entries = TreeSet::<SizeSortedFile>::new();
 
-        let size_f = match config.bytes {
-            true => bytes_to_string,
-            false => bytes_to_humanreadable
-        };
+	let size_f : fn (u64) -> String = match config.bytes {
+		true => bytes_to_string,
+		false => bytes_to_humanreadable,
+	};
 
 	let fs = if config.localfs {
 		match fs::stat(dir) {
@@ -161,7 +162,6 @@ fn visit_dirs_summary(dir: &Path, config : &CmdConfig) {
 	match fs::readdir(dir) {
 		Ok(dir) => {
 			for entry in dir.iter() {
-
 
 				let size = if should_visit(entry, fs) {
 					let mut size = 0;
