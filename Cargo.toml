@@ -8,5 +8,6 @@ authors = [ "dpc@ucore.info" ]
 name = "rdu"
 path = "src/main.rs"
 
-[dependencies.collect]
-src = "git@github.com:Gankro/collect-rs.git"
+[dependencies]
+#collect = "*"
+getopts = "*"
