@@ -9,5 +9,4 @@ name = "rdu"
 path = "src/main.rs"
 
 [dependencies]
-#collect = "*"
-getopts = "*"
+getopts = "0.2.14"

@@ -1,8 +1,3 @@
-#![feature(path_ext)]
-#![feature(metadata_ext)]
-#![feature(file_type)]
-#![feature(raw_ext)]
-#![feature(dir_entry_ext)]
 extern crate getopts;
 
 use std::collections::BTreeSet;
@@ -15,7 +10,7 @@ use std::fs;
 use std::io::stderr;
 use std::path::Path;
 use std::path;
-use std::fs::PathExt;
+//use std::fs::PathExt;
 use std::os::linux::fs::MetadataExt;
 
 struct SizeSortedFile {
