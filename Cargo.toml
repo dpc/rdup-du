@@ -1,6 +1,6 @@
 [package]
 name = "dpc-rdup-du"
-version = "0.1.0"
+version = "0.1.1"
 authors = [ "dpc@ucore.info" ]
 description = "RDUP Disk Usage"
 keywords = ["backup", "du", "rdup"]
