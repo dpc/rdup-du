@@ -1,12 +1,20 @@
 [package]
-name = "rdu"
-version = "0.0.1"
+name = "dpc-rdup-du"
+version = "0.1.0"
 authors = [ "dpc@ucore.info" ]
+description = "RDUP Disk Usage"
+keywords = ["backup", "du", "rdup"]
+license = "MPL-2.0"
+documentation = "https://dpc.github.io/rdup-du/"
+homepage = "https://github.com/dpc/rdup-du"
+repository = "https://github.com/dpc/rdup-du"
+readme = "README.md"
+
 
 [[bin]]
-name = "rdu"
+name = "rdup-du"
 path = "src/main.rs"
 
 [dependencies]
 getopts = "0.2.14"
-libc = "*"
+libc = "0.2.12"
