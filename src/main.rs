@@ -99,7 +99,7 @@ fn visit_dirs(dir: &Path,
     let nobackup = dir.clone();
     nobackup.join(".nobackup");
 
-    if nobackup.is_file() {
+    if nobackup.exists() {
         cb(nobackup);
         return;
     }
