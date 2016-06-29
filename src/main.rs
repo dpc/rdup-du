@@ -96,11 +96,10 @@ fn visit_dirs(dir: &Path,
               fs: Option<u64>,
               cb: &mut FnMut(&Path),
               mut err: &mut FnMut(&Path, io::Error)) {
-    let nobackup = dir.clone();
-    nobackup.join(".nobackup");
+    let nobackup = dir.join(".nobackup");
 
     if nobackup.exists() {
-        cb(nobackup);
+        cb(&nobackup);
         return;
     }
 
