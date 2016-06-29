@@ -59,9 +59,7 @@ fn should_visit(p: &Path, fs: Option<u64>) -> bool {
             false
         }
         Ok(meta) => {
-            if meta.file_type().is_symlink() {
-                false
-            } else if !meta.file_type().is_dir() {
+            if meta.file_type().is_symlink() || !meta.file_type().is_dir() {
                 false
             } else if fs.is_some() {
                 fs == Some(meta.st_dev())
@@ -76,7 +74,7 @@ fn bytes_to_humanreadable(size: u64) -> String {
     let postfixes = ["B", "K", "M", "G", "T"];
 
     let mut size = size;
-    for postfix in postfixes.iter() {
+    for postfix in &postfixes {
         if size < 1000u64 {
             return format!("{:>7}{}", size, postfix);
         }
@@ -138,9 +136,10 @@ fn print_error_path(p: &Path, e: io::Error) {
 fn visit_dirs_summary(dir: &Path, config: &CmdConfig) {
     let mut entries = BTreeSet::<SizeSortedFile>::new();
 
-    let size_f: fn(u64) -> String = match config.bytes {
-        true => bytes_to_string,
-        false => bytes_to_humanreadable,
+    let size_f: fn(u64) -> String = if config.bytes {
+        bytes_to_string
+    } else {
+        bytes_to_humanreadable
     };
 
     let fs = if config.localfs {
@@ -168,7 +167,7 @@ fn visit_dirs_summary(dir: &Path, config: &CmdConfig) {
                                        &mut |p| if p.is_file() {
                                            match p.metadata() {
                                                Err(e) => print_error_path(p, e),
-                                               Ok(meta) => size = size + meta.len(),
+                                               Ok(meta) => size += meta.len(),
                                            }
                                        },
                                        &mut print_error_path);
@@ -197,9 +196,9 @@ fn visit_dirs_summary(dir: &Path, config: &CmdConfig) {
     };
 
     let mut total_size = 0;
-    for entry in entries.iter() {
+    for entry in &entries {
         println!("{:>7} {}", size_f(entry.size), entry.entry.display());
-        total_size = total_size + entry.size;
+        total_size += entry.size;
     }
 
     println!("");
